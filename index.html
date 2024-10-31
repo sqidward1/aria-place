@@ -7,12 +7,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
+        /* Core Variables */
         :root {
             --primary: #ff6b6b;
             --secondary: #4ecdc4;
             --text: #2d3436;
             --background: #ffffff;
             --accent: #ffd93d;
+            --overlay: rgba(0, 0, 0, 0.8);
+            --cursor-size: 20px;
         }
 
         .dark-mode {
@@ -23,11 +26,86 @@
             --accent: #ffe066;
         }
 
+        /* Custom Cursor */
+        .custom-cursor {
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .loading-animation {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--primary);
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            transform-origin: 0 50%;
+            transform: scaleX(0);
+            z-index: 1001;
+        }
+
+        /* Interactive Background */
+        .background-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* Enhanced Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             transition: background-color 0.3s, color 0.3s;
+            cursor: none;
         }
 
         body {
@@ -35,8 +113,10 @@
             color: var(--text);
             background: var(--background);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* Enhanced Header */
         header {
             position: fixed;
             top: 0;
@@ -45,8 +125,40 @@
             padding: 1rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
 
+        /* Mobile Navigation */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 30px;
+            height: 3px;
+            background: var(--text);
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        /* Enhanced Navigation */
         nav {
             max-width: 1200px;
             margin: 0 auto;
@@ -59,6 +171,24 @@
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            transform: translateX(-101%);
+            transition: transform 0.3s;
+        }
+
+        .logo:hover::after {
+            transform: translateX(0);
         }
 
         .nav-links {
@@ -70,14 +200,30 @@
             color: var(--text);
             text-decoration: none;
             font-weight: 500;
+            position: relative;
+            padding: 5px 0;
         }
 
-        .nav-links a:hover {
-            color: var(--primary);
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform 0.3s;
         }
 
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Main Content */
         main {
             margin-top: 4rem;
+            position: relative;
         }
 
         section {
@@ -86,35 +232,82 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .content {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
         }
 
+        /* Enhanced Home Section */
         #home {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: var(--accent);
-            color: var(--text);
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            margin-top: 2rem;
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100vw, 100vh) rotate(360deg); }
+        }
+
+        /* Enhanced Blog Section */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .blog-card {
+            background: var(--background);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
             transition: transform 0.3s;
         }
 
-        .cta-button:hover {
-            transform: translateY(-3px);
+        .blog-card:hover {
+            transform: translateY(-5px);
         }
 
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: var(--secondary);
+            position: relative;
+        }
+
+        .blog-content {
+            padding: 1.5rem;
+        }
+
+        .blog-date {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        /* Enhanced Gallery */
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -128,63 +321,118 @@
             border-radius: 8px;
             cursor: pointer;
             aspect-ratio: 1;
-            background: var(--secondary);
         }
 
-        .gallery-item img {
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.1);
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
         }
 
-        .contact-form {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .form-group input,
-        .form-group textarea {
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--secondary);
-            border-radius: 4px;
-            background: var(--background);
-            color: var(--text);
+            height: 100%;
+            background: var(--overlay);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
         }
 
-        .theme-toggle {
-            padding: 0.5rem 1rem;
-            background: var(--secondary);
-            border: none;
-            border-radius: 4px;
-            color: var(--background);
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
             cursor: pointer;
         }
 
-        footer {
-            background: var(--text);
-            color: var(--background);
-            padding: 2rem;
-            text-align: center;
+        /* Social Share */
+        .social-share {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
         }
 
+        .share-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .share-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Easter Eggs */
+        .konami-mode {
+            animation: rainbow 2s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Enhanced Mobile Styles */
         @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
             .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                background: var(--background);
+                flex-direction: column;
+                padding: 80px 40px;
+                transition: 0.3s;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .social-share {
                 display: none;
             }
 
@@ -195,9 +443,35 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-animation"></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar"></div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
+    <!-- Background Particles -->
+    <div class="background-particles"></div>
+
+    <!-- Social Share -->
+    <div class="social-share">
+        <div class="share-button" onclick="share('twitter')">T</div>
+        <div class="share-button" onclick="share('facebook')">F</div>
+        <div class="share-button" onclick="share('instagram')">I</div>
+    </div>
+
     <header>
         <nav>
             <div class="logo">Aria's Place</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <div class="nav-links">
                 <a href="#home">Home</a>
                 <a href="#about">About</a>
@@ -211,9 +485,10 @@
 
     <main>
         <section id="home">
+            <div class="floating-shapes"></div>
             <div class="content">
                 <h1>Welcome to Aria's Place</h1>
-                <p>A website that exists because I have a problem saying no to women with blonde hair.</p>
+                <p>A website that exists because I have a problem saying no to women.</p>
                 <a href="#about" class="cta-button">Explore More</a>
             </div>
         </section>
@@ -228,7 +503,9 @@
         <section id="blog">
             <div class="content">
                 <h2>Latest Stories</h2>
-                <div id="blog-posts"></div>
+                <div class="blog-grid">
+                    <!-- Blog posts will be dynamically inserted here -->
+                </div>
             </div>
         </section>
 
@@ -238,6 +515,9 @@
                 <div class="gallery">
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #ff6b6b, #ff8787);"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: repeating-linear-gradient(
@@ -247,12 +527,21 @@
                         #45b7af 10px,
                         #45b7af 20px
                         );"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #4ecdc4);"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: linear-gradient(to right, #4ecdc4 50%, #ff6b6b 50%);"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: repeating-radial-gradient(
@@ -262,9 +551,15 @@
                         #4ecdc4 20px,
                         #4ecdc4 40px
                         );"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                     <div class="gallery-item">
                         <div style="width: 100%; height: 100%; background: conic-gradient(from 45deg, #ff6b6b, #4ecdc4, #ff6b6b);"></div>
+                        <div class="gallery-overlay">
+                            <span>View</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -296,13 +591,151 @@
         <p>&copy; 2024 Aria's Place. All rights reserved.</p>
     </footer>
 
+    <!-- Lightbox -->
+    <div class="lightbox">
+        <div class="lightbox-close">×</div>
+        <div class="lightbox-content"></div>
+    </div>
+
     <script>
-        // Theme toggling
+        // Sample blog posts data
+        const blogPosts = [
+            {
+                title: "First Post",
+                date: "2024-01-01",
+                excerpt: "This is the beginning of something special...",
+                image: "var(--primary)"
+            },
+            {
+                title: "Adventures with Aria",
+                date: "2024-01-15",
+                excerpt: "Exploring new horizons and creating memories...",
+                image: "var(--secondary)"
+            },
+            {
+                title: "Creative Journey",
+                date: "2024-02-01",
+                excerpt: "A deep dive into the creative process...",
+                image: "var(--accent)"
+            }
+        ];
+
+        // Initialize loading screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.querySelector('.loading-screen').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Custom cursor
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.querySelector('.custom-cursor');
+            cursor.style.left = e.clientX - cursor.offsetWidth / 2 + 'px';
+            cursor.style.top = e.clientY - cursor.offsetHeight / 2 + 'px';
+        });
+
+        // Interactive background
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 5 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = Math.random() * 100 + 'vh';
+            document.querySelector('.background-particles').appendChild(particle);
+            setTimeout(() => particle.remove(), 5000);
+        }
+
+        setInterval(createParticle, 1000);
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.querySelector('.progress-bar').style.transform = `scaleX(${scrolled / 100})`;
+        });
+
+        // Mobile menu
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Theme toggling with persistence
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
             const button = document.querySelector('.theme-toggle');
-            button.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            button.textContent = isDark ? '☀️' : '🌙';
         }
+
+        // Load saved theme
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+
+        // Gallery lightbox
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const lightbox = document.querySelector('.lightbox');
+                const content = document.querySelector('.lightbox-content');
+                content.innerHTML = item.innerHTML;
+                lightbox.style.display = 'flex';
+            });
+        });
+
+        document.querySelector('.lightbox-close').addEventListener('click', () => {
+            document.querySelector('.lightbox').style.display = 'none';
+        });
+
+        // Social sharing
+        function share(platform) {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('Check out Aria\'s Place!');
+            let shareUrl = '';
+
+            switch(platform) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'instagram':
+                    // Instagram doesn't support direct sharing links
+                    alert('Copy this link to share on Instagram: ' + window.location.href);
+                    return;
+            }
+
+            window.open(shareUrl, '_blank');
+        }
+
+        // Populate blog posts
+        function populateBlog() {
+            const blogGrid = document.querySelector('.blog-grid');
+            blogPosts.forEach(post => {
+                const article = document.createElement('article');
+                article.className = 'blog-card';
+                article.innerHTML = `
+                    <div class="blog-image" style="background: ${post.image}"></div>
+                    <div class="blog-content">
+                        <div class="blog-date">${post.date}</div>
+                        <h3>${post.title}</h3>
+                        <p>${post.excerpt}</p>
+                    </div>
+                `;
+                blogGrid.appendChild(article);
+            });
+        }
+
+        populateBlog();
 
         // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -353,6 +786,20 @@
             scrollTrigger: {
                 trigger: '#gallery',
                 start: 'top center',
+            }
+        });
+
+        // Easter egg - Konami code
+        let keys = [];
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        
+        document.addEventListener('keydown', (e) => {
+            keys.push(e.key);
+            keys = keys.slice(-10);
+            
+            if (JSON.stringify(keys) === JSON.stringify(konamiCode)) {
+                document.body.classList.add('konami-mode');
+                setTimeout(() => document.body.classList.remove('konami-mode'), 5000);
             }
         });
 
